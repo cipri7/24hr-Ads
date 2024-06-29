@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Upload</title>
+</head>
+<body>
+    <h1>Upload Your Photo</h1>
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" id="photo" name="photo" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <% if (imageUrl) { %>
+        <h2>Current Photo:</h2>
+        <img src="<%= imageUrl %>" alt="Uploaded Photo" style="max-width: 100%;">
+    <% } else { %>
+        <p>No photo currently displayed</p>
+    <% } %>
+</body>
+</html>
