@@ -18,23 +18,29 @@ const upload = multer({ storage });
 const mongoUri = 'mongodb://localhost:27017';
 let db;
 
+const PORT = process.env.PORT || 3000;
+
 MongoClient.connect(mongoUri)
     .then(client => {
         db = client.db('photoSite');
-        app.listen(3000, () => {
-            console.log('Server is running on port 3000');
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
         });
     })
     .catch(error => console.error(error));
 
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 app.post('/upload', upload.single('photo'), async (req, res) => {
     const photo = {
         filename: req.file.filename,
-        uploadTime: new Date()
+        uploadTime: new Date(),
+        link: req.body.link
     };
     await db.collection('photos').insertOne(photo);
     res.redirect('/');
@@ -43,8 +49,8 @@ app.post('/upload', upload.single('photo'), async (req, res) => {
 app.get('/', async (req, res) => {
     const currentPhoto = await db.collection('photos').findOne({}, { sort: { uploadTime: -1 } });
     if (currentPhoto) {
-        res.render('index', { imageUrl: `/uploads/${currentPhoto.filename}` });
+        res.render('index', { imageUrl: `/uploads/${currentPhoto.filename}`, link: currentPhoto.link });
     } else {
-        res.render('index', { imageUrl: null });
+        res.render('index', { imageUrl: null, link: null });
     }
 });
